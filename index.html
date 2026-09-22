@@ -494,10 +494,19 @@ setTimeout(()=>{const loader=document.getElementById('appLoader');if(loader)load
     if (typeof toast === 'function') toast('Aplicativo instalado com sucesso.');
   });
 
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!window.__pwaReloaded5144) {
+        window.__pwaReloaded5144 = true;
+        window.location.reload();
+      }
+    });
+  }
+
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     window.addEventListener('load', async () => {
       try {
-        const registration = await navigator.serviceWorker.register('./sw.js', {
+        const registration = await navigator.serviceWorker.register('./sw.js?v=5.14.4', {
           scope: './'
         });
 

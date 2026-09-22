@@ -1,11 +1,11 @@
 {
-  "id": "./",
+  "id": "https://rochajr234.github.io/Vendas-5.14/",
   "name": "Controle de Vendas",
   "short_name": "Vendas",
   "description": "Controle simples, rápido e organizado de vendas.",
   "lang": "pt-BR",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "https://rochajr234.github.io/Vendas-5.14/",
+  "scope": "https://rochajr234.github.io/Vendas-5.14/",
   "display": "standalone",
   "display_override": [
     "standalone",
