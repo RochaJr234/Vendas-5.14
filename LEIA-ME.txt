@@ -1,0 +1,4 @@
+Controle de Vendas 5.12
+- Corrigido o clique para abrir dias fechados e exibir todas as vendas individuais.
+- Adicionado botão discreto de Resetar dados no rodapé, com dupla confirmação.
+- Mantida a instalação PWA e a abertura Rocha Digital.
