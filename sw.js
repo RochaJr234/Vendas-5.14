@@ -1,4 +1,4 @@
-const CACHE="controle-vendas-5.14.1";
+const CACHE="controle-vendas-5.14.1.1";
 const ASSETS=["./","./index.html","./style.css","./script.js","./manifest.webmanifest","./assets/rocha-digital-splash.png","./assets/rocha-digital-splash.jpg","./assets/rocha-digital-abertura.jpg","./assets/rocha-digital-logo.jpg","./assets/icon-192.png","./assets/icon-512.png"];
 self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
