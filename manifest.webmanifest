@@ -3,7 +3,7 @@
   "short_name": "Vendas",
   "description": "Controle simples, rápido e organizado de vendas.",
   "lang": "pt-BR",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -11,16 +11,23 @@
   "theme_color": "#1769e0",
   "icons": [
     {
-      "src": "assets/icon-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/icon-512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "id": "./",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "prefer_related_applications": false,
+  "version": "5.14.2"
 }
