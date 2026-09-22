@@ -417,18 +417,99 @@ setTimeout(()=>{const loader=document.getElementById('appLoader');if(loader)load
 
 /* PWA — instalação como aplicativo */
 (() => {
-  let deferredPrompt = null;
+  'use strict';
+
   const installBtn = document.getElementById('btnInstalar');
-  const showInstall = () => { if (installBtn) installBtn.title = 'Instalar aplicativo'; };
-  const hideInstall = () => { if (installBtn) installBtn.title = 'Aplicativo instalado'; };
-  window.addEventListener('beforeinstallprompt', (event) => { event.preventDefault(); deferredPrompt = event; showInstall(); });
-  if (installBtn) installBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) { alert('Se a instalação automática não abrir, use o menu do navegador e escolha “Adicionar à tela inicial” ou “Instalar aplicativo”.'); return; }
-    deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; hideInstall();
+  let deferredPrompt = null;
+
+  const isStandalone = () =>
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
+  const setInstallState = (state) => {
+    if (!installBtn) return;
+    installBtn.disabled = state === 'installed';
+    installBtn.setAttribute('aria-disabled', state === 'waiting' ? 'true' : 'false');
+
+    if (state === 'ready') {
+      installBtn.title = 'Instalar aplicativo';
+      installBtn.classList.add('install-ready');
+      installBtn.style.opacity = '1';
+    } else if (state === 'installed') {
+      installBtn.title = 'Aplicativo instalado';
+      installBtn.classList.remove('install-ready');
+      installBtn.style.opacity = '.55';
+    } else {
+      installBtn.title = 'Preparando instalação';
+      installBtn.classList.remove('install-ready');
+      installBtn.style.opacity = '.72';
+    }
+  };
+
+  setInstallState(isStandalone() ? 'installed' : 'waiting');
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    setInstallState('ready');
   });
-  window.addEventListener('appinstalled', () => { deferredPrompt = null; hideInstall(); });
-  if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (isStandalone()) {
+        setInstallState('installed');
+        return;
+      }
+
+      if (!deferredPrompt) {
+        setInstallState('waiting');
+        if (typeof toast === 'function') {
+          toast('A instalação está sendo preparada. Aguarde e toque novamente.', 'warn');
+        }
+        return;
+      }
+
+      const promptEvent = deferredPrompt;
+      deferredPrompt = null;
+
+      try {
+        await promptEvent.prompt();
+        const choice = await promptEvent.userChoice;
+
+        if (choice && choice.outcome === 'accepted') {
+          setInstallState('installed');
+        } else {
+          setInstallState('waiting');
+        }
+      } catch (error) {
+        console.warn('Falha ao abrir o instalador PWA:', error);
+        setInstallState('waiting');
+      }
+    });
+  }
+
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    setInstallState('installed');
+    if (typeof toast === 'function') toast('Aplicativo instalado com sucesso.');
+  });
+
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', async () => {
+      try {
+        const registration = await navigator.serviceWorker.register('./sw.js', {
+          scope: './'
+        });
+
+        await navigator.serviceWorker.ready;
+
+        if (registration.waiting) {
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+      } catch (error) {
+        console.warn('Service Worker não pôde ser registrado:', error);
+      }
+    });
   }
 })();
 </script>
